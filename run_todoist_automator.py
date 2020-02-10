@@ -1,4 +1,4 @@
-from todoist_tools import api_wrapper, habit_tracker
+from todoist_tools import api_wrapper, habit_tracker, hygiene
 import argparse
 
 #########################################
@@ -9,6 +9,7 @@ parser.add_argument('--start_of_day_checklist', action='store_true')
 parser.add_argument('--end_of_day_checklist', action='store_true')
 parser.add_argument('--weekly_review_checklist', action='store_true')
 parser.add_argument('--update_habits', action='store_true')
+parser.add_argument('--run_hygienist', action='store_true')
 
 args = parser.parse_args()
 
@@ -17,6 +18,7 @@ args = parser.parse_args()
 #########################################
 api = api_wrapper.ApiWrapper()
 habits = habit_tracker.HabitTracker(api)
+hygienist = hygiene.Hygienist(api)
 
 # Start of day checklist
 if args.start_of_day_checklist:
@@ -33,7 +35,11 @@ if args.weekly_review_checklist:
 # Update habits
 if args.update_habits:
     habits.update_habits()
-    
+
+# Run hygienist
+if args.run_hygienist:
+    hygienist.run_hygienist()
+
 
 #########################################
 # Commit all changes at once

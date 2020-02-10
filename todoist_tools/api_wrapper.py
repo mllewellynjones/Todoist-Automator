@@ -50,6 +50,11 @@ class ApiWrapper():
         return item_list
 
 
+    def get_all_items(self):
+        """"Returns every item in Todoist"""
+        return self.api.state['items']
+
+
     def get_root_items_in_project(self, project_identifier):
         "Returns only the root items from a project, ignoring any subitems"
         complete_item_list = self.get_items_in_project(project_identifier)

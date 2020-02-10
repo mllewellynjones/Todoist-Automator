@@ -11,11 +11,13 @@ class HabitTracker():
 
         self.api_wrapper = api_wrapper
 
+
     def get_habits_list(self):
         """Returns a list of all habits in the habit project"""
 
         return self.api_wrapper.get_root_items_in_project('HABITS')
-           
+
+
     def update_habits(self):
         """Updates all habits by:
 
@@ -45,7 +47,12 @@ class HabitTracker():
         """Checks if a habit is overdue, returning True if so and false otherwise"""
 
         today = datetime.now().date()
-        habit_due_date = datetime.strptime(habit['due']['date'], "%Y-%m-%d").date()
+        try:
+            habit_due_date = datetime.strptime(habit['due']['date'], "%Y-%m-%d").date()
+
+        except TypeError:
+            # Hit when habit['due'] is none because there is no due date
+            return False
 
         if habit_due_date <= today:
             return True
@@ -59,13 +66,18 @@ class HabitTracker():
         day_today = datetime.strftime(datetime.now(), '%A').lower()
         workdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
 
-        if habit['due']['string'] == 'every day':
-            return True
-        elif habit['due']['string'] == 'every workday' and day_today in workdays:
-            return True
-        elif day_today in habit['due']['string']:
-            return True
-        else:
+        try:
+            if habit['due']['string'] == 'every day':
+                return True
+            elif habit['due']['string'] == 'every workday' and day_today in workdays:
+                return True
+            elif day_today in habit['due']['string']:
+                return True
+            else:
+                return False
+
+        except TypeError:
+            # Hit when habit['due'] is none because there is no due date
             return False
 
 
