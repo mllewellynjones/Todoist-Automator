@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 
-TIMEBOX_TRACKER_RE = re.compile('(?P<tbtracker>\[TBS \d+\\\d+\])(?P<Description>.*)')
+TIMEBOX_TRACKER_RE = re.compile('(?P<tbtracker>\[TBS \d+/\d+\])(?P<Description>.*)')
 
 class Hygienist():
     """Performs periodic hygiene to keep system in a good state"""
@@ -44,11 +44,11 @@ class Hygienist():
                 master_id = item['id']
 
                 # Feels inefficient to loop through everything again
-                for item in self.api_wrapper.get_all_items():
-                    if item['parent_id'] == master_id:
+                for sub_item in self.api_wrapper.get_all_items():
+                    if sub_item['parent_id'] == master_id:
                         total_timeboxes += 1
 
-                        if item['checked'] == 1:
+                        if sub_item['checked'] == 1:
                             completed_timeboxes += 1
 
                 timebox_tracker_match = TIMEBOX_TRACKER_RE.search(item['content'])
@@ -56,7 +56,7 @@ class Hygienist():
                 if timebox_tracker_match:
                     new_content = ('[TBS {}/{}]'.format(completed_timeboxes, total_timeboxes)
                                    + timebox_tracker_match.group('Description'))
-                    item['content'] = new_content
+                    item.update(content=new_content)
 
                 # Collapse the item regardless of initial state
-                item['collapsed'] = 1
+                item.update(collapsed=1)
