@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 
-TIMEBOX_TRACKER_RE = re.compile('(?P<TB Tracker>\[TBS \d+\\\d+\])(?P<Description>.*)')
+TIMEBOX_TRACKER_RE = re.compile('(?P<tbtracker>\[TBS \d+\\\d+\])(?P<Description>.*)')
 
 class Hygienist():
     """Performs periodic hygiene to keep system in a good state"""
