@@ -32,7 +32,7 @@ class Hygienist():
             except TypeError:
                 continue
 
-    def ensure_timebox_trackers_are_accurate(self):
+    def ensure_timebox_trackers_accurate(self):
         """Updates the timebox trackers for every task based on how many timebox subtasks have been completed"""
 
         for item in self.api_wrapper.get_all_items():
