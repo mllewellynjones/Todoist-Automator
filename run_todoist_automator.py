@@ -9,7 +9,8 @@ parser.add_argument('--start_of_day_checklist', action='store_true')
 parser.add_argument('--end_of_day_checklist', action='store_true')
 parser.add_argument('--weekly_review_checklist', action='store_true')
 parser.add_argument('--update_habits', action='store_true')
-parser.add_argument('--run_hygienist', action='store_true')
+parser.add_argument('--run_daily_hygienist', action='store_true')
+parser.add_argument('--run_hourly_hygienist', action='store_true')
 
 args = parser.parse_args()
 
@@ -36,10 +37,13 @@ if args.weekly_review_checklist:
 if args.update_habits:
     habits.update_habits()
 
-# Run hygienist
-if args.run_hygienist:
-    hygienist.run_hygienist()
+# Run daily hygienist
+if args.run_daily_hygienist:
+    hygienist.run_daily_hygienist()
 
+# Run hourly hygienist
+if args.run_hourly_hygienist:
+    hygienist.run_hourly_hygienist()
 
 #########################################
 # Commit all changes at once

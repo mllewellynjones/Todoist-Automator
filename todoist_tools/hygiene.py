@@ -11,9 +11,12 @@ class Hygienist():
 
         self.api_wrapper = api_wrapper
 
-    def run_hygienist(self):
-        """Runs all periodic hygiene tasks"""
+    def run_daily_hygienist(self):
+        """Runs all hygiene tasks that can be run frequently to keep Todoist in shape"""
         self.remove_priorities_from_all_not_due_today()
+
+    def run_hourly_hygienist(self):
+        """Runs all hygiene tasks that should only be run once in the early hours of the morning"""
         self.ensure_timebox_trackers_accurate()
 
     def remove_priorities_from_all_not_due_today(self):
