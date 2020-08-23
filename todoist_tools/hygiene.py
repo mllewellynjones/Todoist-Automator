@@ -96,7 +96,7 @@ class Hygienist():
         matches the current time and day"""
 
         scheduled_items = [item for item in self.api_wrapper.get_all_items()
-                            if SCHEDULE_STRING_PREFIX in item['content'] and item['checked'] == 0]
+                           if SCHEDULE_STRING_PREFIX in item['content'] and item['checked'] == 0]
 
         for item in scheduled_items:
             if self.parse_schedule_string_for_move(item['content']):
