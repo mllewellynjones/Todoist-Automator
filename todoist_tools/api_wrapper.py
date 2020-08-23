@@ -44,7 +44,7 @@ class ApiWrapper():
             project_id = project_identifier
 
         for item in self.api.state['items']:
-            if item['project_id'] == project_id:
+            if item['project_id'] == project_id and item['checked'] == 0:
                 item_list.append(item)
 
         return item_list
@@ -79,7 +79,7 @@ class ApiWrapper():
         
         subitems = {top_item_id: {}}
         for item in self.api.state['items']:
-            if item['parent_id'] == top_item_id:
+            if item['parent_id'] == top_item_id and item['checked'] == 0:
                 # Get subitems for this new item
                 nested_subitems = self.get_all_subitem_ids_by_id(item['id'])
                 subitems[top_item_id][item['id']] = nested_subitems[item['id']]
@@ -123,4 +123,3 @@ class ApiWrapper():
         """Remove unnecessary nesting of results from getting an item by ID"""
 
         return self.api.items.get(item_id)['item']
-

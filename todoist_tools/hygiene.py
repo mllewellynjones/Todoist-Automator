@@ -2,6 +2,8 @@ import re
 from datetime import datetime
 
 TIMEBOX_TRACKER_RE = re.compile('(?P<tbtracker>\[TBS \d+/\d+\])(?P<Description>.*)')
+SCHEDULE_STRING_PREFIX = "SCHED: "
+SCHEDULE_STRING_RE = re.compile('\[' + SCHEDULE_STRING_PREFIX + '(?P<hour>.+) (?P<day_of_week>.+)\]')
 
 class Hygienist():
     """Performs periodic hygiene to keep system in a good state"""
@@ -12,12 +14,13 @@ class Hygienist():
         self.api_wrapper = api_wrapper
 
     def run_daily_hygienist(self):
-        """Runs all hygiene tasks that can be run frequently to keep Todoist in shape"""
+        """Runs all hygiene tasks that should only be run once in the early hours of the morning"""
         self.remove_priorities_from_all_not_due_today()
 
     def run_hourly_hygienist(self):
-        """Runs all hygiene tasks that should only be run once in the early hours of the morning"""
+        """Runs all hygiene tasks that can be run frequently to keep Todoist in shape"""
         self.ensure_timebox_trackers_accurate()
+        self.copy_tasks_with_schedule_string()
 
     def remove_priorities_from_all_not_due_today(self):
         """Priorities can be accidentally assigned to tasks not due today, e.g. if the task is recurring. This
@@ -63,3 +66,38 @@ class Hygienist():
 
                 # Collapse the item regardless of initial state
                 item.update(collapsed=1)
+
+
+    def parse_schedule_string_for_move(self, schedule_string):
+        """Parses a string of the form [SCHED: hour, day_of_week] to determine whether the item should be moved
+        into the inbox now, returning either True or False
+
+        hour: 0-23
+        day_of_week: 1-7
+        """
+        schedule_string_match = SCHEDULE_STRING_RE.search(schedule_string)
+        if schedule_string_match:
+            hour = schedule_string_match.group('hour')
+            day_of_week = schedule_string_match.group('day_of_week')
+        else:
+            return False
+
+        current_hour = str(datetime.now().hour)
+        current_day = str(datetime.now().isoweekday())
+
+        if current_hour == hour or hour == '*':
+            if current_day == day_of_week or day_of_week == '*':
+                return True
+
+        return False
+
+    def copy_tasks_with_schedule_string(self):
+        """Looks through all items for for tasks with a schedule string and moves them to the inbox if their string
+        matches the current time and day"""
+
+        scheduled_items = [item for item in self.api_wrapper.get_all_items()
+                            if SCHEDULE_STRING_PREFIX in item['content'] and item['checked'] == 0]
+
+        for item in scheduled_items:
+            if self.parse_schedule_string_for_move(item['content']):
+                self.api_wrapper.copy_item_to_inbox_by_id(item['id'])
